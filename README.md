@@ -12,7 +12,13 @@ The course aims to introduce students to the paradigms of Digital Humanities (DH
 
 ### Contenuti
 
+TO DO
+
 ### Bibliografia
 
+TO DO
+
 ### Esame
+
+TO DO
 
