@@ -5,13 +5,13 @@
 @import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&display=swap');
 
 :root {
-  --primary: #009688;
-  --secondary: #453688;
-  --tertiary: #009688;
+  --primary: #980260;
+  --secondary: #333;
+  --tertiary: #980260;
   --light: #fff;
   --dark: #333;
-  --link: #d76016;
-  --text-dark: #453688;
+  --link: #ff7017;
+  --text-dark: #333;
   --text-light: #fff;
   --code-bg: #f8f8f8;
   --font-size: 28px;
