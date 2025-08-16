@@ -9,7 +9,7 @@
   --secondary: #333;
   --tertiary: #980260;
   --light: #fff;
-  --dark: #333;
+  --dark: #980260;
   --link: #ff7017;
   --text-dark: #333;
   --text-light: #fff;
@@ -24,9 +24,7 @@
 .flex-column {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2;
+  justify-content: space-between;
   height: 100%;
 }
 
@@ -35,6 +33,7 @@
   display: flex;
   gap: 2rem;
   align-items: center;
+  flex: 1;
 }
 
 /* Equal width for both children */
@@ -51,6 +50,31 @@
 .flex img {
   max-width: 100%;
   height: auto;
+}
+
+.split-slide {
+  display: flex;
+  height: 100%;
+  width: 100%;
+}
+
+.left-half,
+.right-half {
+  flex: 1;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.left-half {
+  background-color: var(--light);
+  color: var(--text-dark);
+}
+
+.right-half {
+  background-color: var(--dark); /* Dark background */
+  color: var(--text-light);
 }
 
 
@@ -70,7 +94,6 @@ figcaption {
   position: absolute;
   bottom: 0;
   left: 0;
-  right: 0;
   width: 100%;
   background-color: #f3f2f2;
   padding: 1rem;
@@ -109,7 +132,7 @@ h1 {
 }
 
 h2 {
-  color: var(--secondary);
+  color: var(--text-light);
 }
 
 h3 {
