@@ -156,7 +156,8 @@ pre {
 
 /* Links */
 a {
-  color: var(--text-dark);
+  color: var(--primary);
+  text-decoration: underline;
 }
 
 a:hover {
