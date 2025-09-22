@@ -36,6 +36,10 @@ section::after {
     content: attr(data-marpit-pagination) '/' attr(data-marpit-pagination-total);
 }
 
+p {
+  text-align: justify;
+}
+
 /* Outer wrapper that stacks rows */
 .flex-column {
   display: flex;
