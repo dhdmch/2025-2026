@@ -38,6 +38,7 @@ section::after {
 
 p {
   text-align: justify;
+  hyphens: auto;
 }
 
 /* Outer wrapper that stacks rows */
