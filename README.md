@@ -17,7 +17,7 @@ The course aims to introduce students to the paradigms of Digital Humanities (DH
 | Lezione | Titolo | Teoria | Pratica | Data | Stato |
 | ------- | ------ | ------ | ------- | ---- | ----- |
 | 01 | Introduzione | [Dati, Metadati e Digital Humanities](https://dhdmch.github.io/2025-2026/lessons/01/20251112-intro.html) | - | 12-11-2025 | ✅ |
-| 02 | Pianificazione I | Data Management | Intro a Python | 13-11-2025 | |
+| 02 | Pianificazione I | Data Management | Intro a Python | 13-11-2025 | ✅ |
 | 03 | Pianificazione II | Metadati | Dati in Python | 14-11-2025 | |
 | 04 | Pianificazione III | Data Management Plan | Strutture dati | 19-11-2025 | |
 | 05 | Acquisizione I | Buone pratiche | Control flow | 20-11-2025 | |
