@@ -10,6 +10,41 @@ Wikidata Query Service: https://query.wikidata.org/
 
 ## Query di estrazione
 
+###
+
+SELECT DISTINCT ?painting ?title ?date ?collection_label ?movement_label ?creator_label ?subject_label ?materials_label ?depicted_label ?width ?height ?inventory_number
+WHERE {
+  ?painting wdt:P31 wd:Q3305213;
+            wdt:P1476 ?title;
+            wdt:P17 wd:Q38;
+            wdt:P195 ?collection;
+            wdt:P571 ?date;
+            wdt:P136 wd:Q3374376;
+            wdt:P135 ?movement;
+            wdt:P170 ?creator;
+            wdt:P921 ?subject;
+            wdt:P186 ?materials;
+            wdt:P180 ?depicted;
+            wdt:P2049 ?width;
+            wdt:P2048 ?height;
+            wdt:P217 ?inventory_number.
+  ?collection rdfs:label ?collection_label.
+  ?movement rdfs:label ?movement_label.
+  ?creator rdfs:label ?creator_label.
+  ?subject rdfs:label ?subject_label.
+  ?materials rdfs:label ?materials_label.
+  ?depicted rdfs:label ?depicted_label.
+  
+            
+  FILTER(LANG(?collection_label) = "it")
+  FILTER(LANG(?movement_label) = "it")
+  FILTER(LANG(?creator_label) = "it")
+  FILTER(LANG(?subject_label) = "it")
+  FILTER(LANG(?materials_label) = "it")
+  FILTER(LANG(?depicted_label) = "it")
+}
+LIMIT 100
+
 ### 1400-1499
 
 ```sparql
