@@ -2,7 +2,7 @@
 
 ## Descrizione
 
-Dataset estratto da Wikidata contenente i metadati descrittivi di dipinti appartenenti all'arco temporale circoscritto tra il 1400 e il 1999.
+Dataset estratto da Wikidata contenente i metadati descrittivi di opere d'arte visiva localizzate in Italia.
 
 ## Endpoint
 
@@ -26,7 +26,7 @@ WHERE {
 ### Artisti
 
 ```sparql
-SELECT DISTINCT ?id ?sesso (GROUP_CONCAT(?artista; SEPARATOR="; ") AS ?artisti)
+SELECT DISTINCT ?id (GROUP_CONCAT(CONCAT(?artista, " (", ?sesso, ")"); SEPARATOR="; ") AS ?artisti)
 WHERE {
   ?id wdt:P31 wd:Q3305213;
       wdt:P17 wd:Q38;
@@ -41,13 +41,13 @@ WHERE {
     FILTER(LANG(?sesso) = "it")
   }
 }
-GROUP BY ?id ?sesso
+GROUP BY ?id
 ```
 
 ### Date
 
 ```sparql
-SELECT DISTINCT ?id (GROUP_CONCAT(?data; SEPARATOR=" | ") AS ?datax)
+SELECT DISTINCT ?id (GROUP_CONCAT(?data; SEPARATOR=" | ") AS ?data_creazione)
 WHERE { 
   ?id wdt:P31 wd:Q3305213;
             wdt:P17 wd:Q38;
