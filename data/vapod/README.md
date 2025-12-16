@@ -10,96 +10,193 @@ Wikidata Query Service: https://query.wikidata.org/
 
 ## Query di estrazione
 
-###
-
-SELECT DISTINCT ?painting ?title ?date ?collection_label ?movement_label ?creator_label ?subject_label ?materials_label ?depicted_label ?width ?height ?inventory_number
-WHERE {
-  ?painting wdt:P31 wd:Q3305213;
-            wdt:P1476 ?title;
-            wdt:P17 wd:Q38;
-            wdt:P195 ?collection;
-            wdt:P571 ?date;
-            wdt:P136 wd:Q3374376;
-            wdt:P135 ?movement;
-            wdt:P170 ?creator;
-            wdt:P921 ?subject;
-            wdt:P186 ?materials;
-            wdt:P180 ?depicted;
-            wdt:P2049 ?width;
-            wdt:P2048 ?height;
-            wdt:P217 ?inventory_number.
-  ?collection rdfs:label ?collection_label.
-  ?movement rdfs:label ?movement_label.
-  ?creator rdfs:label ?creator_label.
-  ?subject rdfs:label ?subject_label.
-  ?materials rdfs:label ?materials_label.
-  ?depicted rdfs:label ?depicted_label.
-  
-            
-  FILTER(LANG(?collection_label) = "it")
-  FILTER(LANG(?movement_label) = "it")
-  FILTER(LANG(?creator_label) = "it")
-  FILTER(LANG(?subject_label) = "it")
-  FILTER(LANG(?materials_label) = "it")
-  FILTER(LANG(?depicted_label) = "it")
-}
-LIMIT 100
-
-### 1400-1499
+### Titoli
 
 ```sparql
-SELECT ?item ?title (YEAR(?date) AS ?year) ?genreLabel ?creatorLabel ?countryLabel ?subjectLabel ?depictsLabel ?collectionLabel ?movementLabel ?materialLabel ?width ?height ?commissionerLabel ?creatorSexLabel ?collectionOwnerLabel ?commissionerSexLabel
-WHERE
-{
-  ?item wdt:P31 wd:Q3305213 .
-  ?item wdt:P1476 ?title .
-  ?item wdt:P571 ?date .
-  ?item wdt:P136 ?genre .
-  ?item wdt:P17 ?country .
-  ?item wdt:P921 ?subject .
-  ?item wdt:P180 ?depicts .
-  ?item wdt:P2049 ?width .
-  ?item wdt:P2048 ?height .
-  ?item wdt:P186 ?material .
+SELECT DISTINCT ?id ?titolo
+WHERE { 
+  ?id wdt:P31 wd:Q3305213;
+            wdt:P17 wd:Q38;
+            rdfs:label ?titolo.
   
-  OPTIONAL { ?item wdt:P195 ?collection . ?collection wdt:P127 ?collectionOwner . }
-  OPTIONAL { ?item wdt:P135 ?movement . }
-  OPTIONAL { ?item wdt:P170 ?creator . ?creator wdt:P21 ?creatorSex . }
-  OPTIONAL { ?item wdt:P88 ?commissioner . ?commissioner wdt:P21 ?commissionerSex . }
-  
-  FILTER(LANG(?title) = "en")
-  FILTER(YEAR(?date) >= 1400 && YEAR(?date) < 1500)
-  
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "it". }
+  FILTER(LANG(?titolo) = "it")   
 }
 ```
 
-### 1500-1599
+### Artisti
 
 ```sparql
-SELECT ?item ?title (YEAR(?date) AS ?year) ?genreLabel ?creatorLabel ?countryLabel ?subjectLabel ?depictsLabel ?collectionLabel ?movementLabel ?materialLabel ?width ?height ?commissionerLabel ?creatorSexLabel ?collectionOwnerLabel ?commissionerSexLabel
-WHERE
-{
-  ?item wdt:P31 wd:Q3305213 .
-  ?item wdt:P1476 ?title .
-  ?item wdt:P571 ?date .
-  ?item wdt:P136 ?genre .
-  ?item wdt:P17 ?country .
-  ?item wdt:P921 ?subject .
-  ?item wdt:P180 ?depicts .
-  ?item wdt:P2049 ?width .
-  ?item wdt:P2048 ?height .
-  ?item wdt:P186 ?material .
-  
-  OPTIONAL { ?item wdt:P195 ?collection . ?collection wdt:P127 ?collectionOwner . }
-  OPTIONAL { ?item wdt:P135 ?movement . }
-  OPTIONAL { ?item wdt:P170 ?creator . ?creator wdt:P21 ?creatorSex . }
-  OPTIONAL { ?item wdt:P88 ?commissioner . ?commissioner wdt:P21 ?commissionerSex . }
-  
-  FILTER(LANG(?title) = "en")
-  FILTER(YEAR(?date) >= 1500 && YEAR(?date) < 1600)
-  
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "it". }
-  
+SELECT DISTINCT ?id ?sesso (GROUP_CONCAT(?artista; SEPARATOR="; ") AS ?artisti)
+WHERE {
+  ?id wdt:P31 wd:Q3305213;
+      wdt:P17 wd:Q38;
+      rdfs:label ?titolo.
+  FILTER(LANG(?titolo) = "it")
+  OPTIONAL {
+    ?id wdt:P170 ?creator.
+    ?creator rdfs:label ?artista;
+             wdt:P21 ?sex.
+    ?sex rdfs:label ?sesso.
+    FILTER(LANG(?artista) = "it")    
+    FILTER(LANG(?sesso) = "it")
+  }
 }
+GROUP BY ?id ?sesso
+```
+
+### Date
+
+```sparql
+SELECT DISTINCT ?id (GROUP_CONCAT(?data; SEPARATOR=" | ") AS ?datax)
+WHERE { 
+  ?id wdt:P31 wd:Q3305213;
+            wdt:P17 wd:Q38;
+            rdfs:label ?titolo.
+  OPTIONAL {
+    ?id wdt:P571 ?date.
+    BIND(YEAR(?date) AS ?data)
+  }
+  FILTER(LANG(?titolo) = "it")   
+}
+GROUP BY ?id
+```
+
+### Larghezze
+
+```sparql
+SELECT DISTINCT ?id (MAX(?width) AS ?larghezza)
+WHERE { 
+  ?id wdt:P31 wd:Q3305213;
+            wdt:P17 wd:Q38;
+            rdfs:label ?titolo.
+  OPTIONAL {
+    ?id wdt:P2049 ?width.
+  }
+  FILTER(LANG(?titolo) = "it")   
+}
+GROUP BY ?id
+```
+
+### Altezze
+
+```sparql
+SELECT DISTINCT ?id (MAX(?height) AS ?altezza)
+WHERE { 
+  ?id wdt:P31 wd:Q3305213;
+            wdt:P17 wd:Q38;
+            rdfs:label ?titolo.
+  OPTIONAL {
+    ?id wdt:P2048 ?height.
+  }
+  FILTER(LANG(?titolo) = "it")   
+}
+GROUP BY ?id
+```
+
+### Luoghi
+
+```sparql
+SELECT DISTINCT ?id (GROUP_CONCAT(?luogo; SEPARATOR="; ") AS ?luoghi)
+WHERE { 
+  ?id wdt:P31 wd:Q3305213;
+            wdt:P17 wd:Q38;
+            rdfs:label ?titolo.
+  OPTIONAL {
+    ?id wdt:P276 ?location.
+    ?location rdfs:label ?luogo. 
+    FILTER(LANG(?luogo) = "it")
+  }
+  FILTER(LANG(?titolo) = "it")   
+}
+GROUP BY ?id
+```
+
+### Collezioni
+
+```sparql
+SELECT DISTINCT ?id (GROUP_CONCAT(?collezione; SEPARATOR="; ") AS ?collezioni)
+WHERE { 
+  ?id wdt:P31 wd:Q3305213;
+            wdt:P17 wd:Q38;
+            rdfs:label ?titolo.
+  OPTIONAL {
+    ?id wdt:P195 ?collection.
+    ?collection rdfs:label ?collezione. 
+    FILTER(LANG(?collezione) = "it")
+  }
+  FILTER(LANG(?titolo) = "it")   
+}
+GROUP BY ?id
+```
+
+### Movimenti
+
+```sparql
+SELECT DISTINCT ?id (GROUP_CONCAT(?movimento; SEPARATOR="; ") AS ?movimenti)
+WHERE { 
+  ?id wdt:P31 wd:Q3305213;
+            wdt:P17 wd:Q38;
+            rdfs:label ?titolo.
+  OPTIONAL {
+    ?id wdt:P135 ?movement.
+    ?movement rdfs:label ?movimento.
+      FILTER(LANG(?movimento) = "it") 
+  }
+  FILTER(LANG(?titolo) = "it")   
+}
+GROUP BY ?id
+```
+
+### Soggetti
+
+```sparql
+SELECT DISTINCT ?id (GROUP_CONCAT(?soggetto; SEPARATOR="; ") AS ?soggetti)
+WHERE { 
+  ?id wdt:P31 wd:Q3305213;
+            wdt:P17 wd:Q38;
+            rdfs:label ?titolo.
+  OPTIONAL {
+    ?id wdt:P921 ?subject.
+    ?subject rdfs:label ?soggetto.
+      FILTER(LANG(?soggetto) = "it") 
+  }
+  FILTER(LANG(?titolo) = "it")   
+}
+GROUP BY ?id
+```
+
+### Contenuti
+
+```sparql
+SELECT DISTINCT ?id (GROUP_CONCAT(?oggetto_rappresentato; SEPARATOR="; ") AS ?contenuti)
+WHERE { 
+  ?id wdt:P31 wd:Q3305213;
+            wdt:P17 wd:Q38;
+            rdfs:label ?titolo.
+  OPTIONAL {
+    ?id wdt:P180 ?depicted.
+    ?depicted rdfs:label ?oggetto_rappresentato.
+    FILTER(LANG(?oggetto_rappresentato) = "it")
+  }
+  FILTER(LANG(?titolo) = "it")   
+}
+GROUP BY ?id
+```
+
+### Generi
+
+```sparql
+SELECT DISTINCT ?id (GROUP_CONCAT(?genere; SEPARATOR="; ") AS ?generi)
+WHERE { 
+  ?id wdt:P31 wd:Q3305213;
+            wdt:P17 wd:Q38;
+            rdfs:label ?titolo.
+  OPTIONAL {
+    ?id wdt:P136 ?genre.
+    ?genre rdfs:label ?genere.
+      FILTER(LANG(?genere) = "it") 
+  }
+  FILTER(LANG(?titolo) = "it")   
+}
+GROUP BY ?id
 ```
