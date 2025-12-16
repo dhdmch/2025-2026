@@ -2,7 +2,7 @@
 
 ## Descrizione
 
-Dataset estratto da Wikidata contenente i metadati descrittivi di pubblicazioni scientifiche che a partire dal 2000 hanno affrontato tematiche inerenti alla biblioteconomia e alla scienza dell'informazione.
+Dataset estratto da Wikidata contenente i metadati descrittivi di pubblicazioni scientifiche italiane.
 
 ## Endpoint
 
@@ -13,70 +13,66 @@ Legacy Wikidata Query Service: https://query-legacy-full.wikidata.org/
 ### Titoli
 
 ```sparql
-SELECT DISTINCT ?id ?title
+SELECT DISTINCT ?id ?titolo
 WHERE {
-  ?id wdt:P1433 ?journal;
-      rdfs:label ?title.
-  ?journal wdt:P17 wd:Q38;
-           wdt:P31 ?tipo_journal.
-  FILTER(?tipo_journal = wd:Q5633421 || ?tipo_journal = wd:Q737498 || ?tipo_journal = wd:Q773668)
-  FILTER(LANG(?title) = "it")
+  ?id wdt:P31 wd:Q13442814;
+      wdt:P1433 ?journal;
+      rdfs:label ?titolo.
+  ?journal wdt:P17 wd:Q38.
+  FILTER(LANG(?titolo) = "it")
 }
 ```
 
 ### Date
 
 ```sparql
-SELECT DISTINCT ?id (GROUP_CONCAT(DISTINCT ?data; SEPARATOR=" | ") AS ?datax)
+SELECT DISTINCT ?id (GROUP_CONCAT(DISTINCT ?data; SEPARATOR=" | ") AS ?data_pubblicazione)
 WHERE {
-  ?id wdt:P1433 ?journal;
-      rdfs:label ?title.
+  ?id wdt:P31 wd:Q13442814;
+      wdt:P1433 ?journal;
+      rdfs:label ?titolo.
+  ?journal wdt:P17 wd:Q38.
   OPTIONAL {
     ?id wdt:P577 ?pubDate.
     BIND(YEAR(?pubDate) AS ?data)
   }
-  ?journal wdt:P17 wd:Q38;
-           wdt:P31 ?tipo_journal.
-  FILTER(?tipo_journal = wd:Q5633421 || ?tipo_journal = wd:Q737498 || ?tipo_journal = wd:Q773668)
-  FILTER(LANG(?title) = "it")
+  FILTER(LANG(?titolo) = "it")
 }
 GROUP BY ?id
 ```
 
-### Journal
+### Riviste
 
 ```sparql
-SELECT DISTINCT ?id ?journal_name 
+SELECT DISTINCT ?id ?rivista
 WHERE {
-  ?id wdt:P1433 ?journal;
-      rdfs:label ?title.
-  ?journal wdt:P17 wd:Q38;
-           wdt:P31 ?tipo_journal.
-  FILTER(?tipo_journal = wd:Q5633421 || ?tipo_journal = wd:Q737498 || ?tipo_journal = wd:Q773668)
+  ?id wdt:P31 wd:Q13442814;
+      wdt:P1433 ?journal;
+      rdfs:label ?titolo.
+  ?journal wdt:P17 wd:Q38.
   OPTIONAL {
-    ?journal rdfs:label ?journal_name.
-    FILTER(LANG(?journal_name) = "it")
+    ?journal rdfs:label ?rivista.
+    FILTER(LANG(?rivista) = "it")
   }
-  FILTER(LANG(?title) = "it")
+  FILTER(LANG(?titolo) = "it")
 }
 ```
 
 ### Licenze
 
 ```sparql
-SELECT DISTINCT ?id (GROUP_CONCAT(DISTINCT ?licenza; SEPARATOR="; ") AS ?licenza_journal)
+SELECT DISTINCT ?id (GROUP_CONCAT(DISTINCT ?licenza; SEPARATOR="; ") AS ?licenze_rivista)
 WHERE {
-  ?id wdt:P1433 ?journal;
-      rdfs:label ?title.
-  ?journal wdt:P17 wd:Q38;
-           wdt:P31 ?tipo_journal.
-  FILTER(?tipo_journal = wd:Q5633421 || ?tipo_journal = wd:Q737498 || ?tipo_journal = wd:Q773668)
+  ?id wdt:P31 wd:Q13442814;
+      wdt:P1433 ?journal;
+      rdfs:label ?titolo.
+  ?journal wdt:P17 wd:Q38.
   OPTIONAL {
     ?journal wdt:P275 ?copyright .
     ?copyright rdfs:label ?licenza.
     FILTER(LANG(?licenza) = "en")
   }
-  FILTER(LANG(?title) = "it")
+  FILTER(LANG(?titolo) = "it")
 }
 GROUP BY ?id
 ```
@@ -84,33 +80,22 @@ GROUP BY ?id
 ### Autori
 
 ```sparql
-SELECT ?id (GROUP_CONCAT(DISTINCT ?autore_completo; SEPARATOR="; ") AS ?autori)
+SELECT ?id (GROUP_CONCAT(CONCAT(?autore, " (", ?sesso, ")"); SEPARATOR="; ") AS ?autori)
 WHERE {
-  ?id wdt:P1433 ?journal;
+  ?id wdt:P31 wd:Q13442814;
+      wdt:P1433 ?journal;
       rdfs:label ?title.
-  ?journal wdt:P17 wd:Q38;
-           wdt:P31 ?tipo_journal.
-  FILTER(?tipo_journal = wd:Q5633421 || ?tipo_journal = wd:Q737498 || ?tipo_journal = wd:Q773668)
+  ?journal wdt:P17 wd:Q38.
   FILTER(LANG(?title) = "it")
   OPTIONAL {
-    {
-      ?id wdt:P50 ?a_item .
-      ?a_item rdfs:label ?a_name_item .
-      FILTER(LANG(?a_name_item) = "it")
+      ?id wdt:P50 ?author .
+      ?author rdfs:label ?autore .
+      FILTER(LANG(?autore) = "it")
       OPTIONAL {
-        ?a_item wdt:P21/rdfs:label ?sex_item .
-        FILTER(LANG(?sex_item) = "it")
+        ?author wdt:P21/rdfs:label ?sesso .
+        FILTER(LANG(?sesso) = "it")
       }
-    }
-    UNION
-    {
-      ?id wdt:P2093 ?a_name_str .
-    }
   }
-  BIND(COALESCE(?a_name_item, ?a_name_str) AS ?real_name)
-  BIND(COALESCE(?sex_item, "N/D") AS ?real_sex)
-  FILTER(BOUND(?real_name))
-  BIND(CONCAT(?real_name, " (", ?real_sex, ")") AS ?autore_completo)
 }
 GROUP BY ?id
 ```
@@ -120,11 +105,10 @@ GROUP BY ?id
 ```sparql
 SELECT DISTINCT ?id (GROUP_CONCAT(DISTINCT ?argomento; SEPARATOR="; ") AS ?argomenti)
 WHERE {
-  ?id wdt:P1433 ?journal;
+  ?id wdt:P31 wd:Q13442814;
+      wdt:P1433 ?journal;
       rdfs:label ?title.
-  ?journal wdt:P17 wd:Q38;
-           wdt:P31 ?tipo_journal.
-  FILTER(?tipo_journal = wd:Q5633421 || ?tipo_journal = wd:Q737498 || ?tipo_journal = wd:Q773668)
+  ?journal wdt:P17 wd:Q38.
   OPTIONAL {
     ?id wdt:P921 ?topic .
     ?topic rdfs:label ?argomento.
@@ -138,32 +122,31 @@ GROUP BY ?id
 ### Pagine
 
 ```sparql
-SELECT DISTINCT ?id ?pagine
+SELECT DISTINCT ?id (GROUP_CONCAT(?pages; SEPARATOR="; ") AS ?pagine)
 WHERE {
-  ?id wdt:P1433 ?journal;
+  ?id wdt:P31 wd:Q13442814;
+      wdt:P1433 ?journal;
       rdfs:label ?title.
   ?journal wdt:P17 wd:Q38;
-           wdt:P31 ?tipo_journal.
-  FILTER(?tipo_journal = wd:Q5633421 || ?tipo_journal = wd:Q737498 || ?tipo_journal = wd:Q773668)
   OPTIONAL {
-    ?id wdt:P304 ?pagine .
+    ?id wdt:P304 ?pages .
   }
   FILTER(LANG(?title) = "it")
 }
+GROUP BY ?id
 ```
 
-### Issue
+### Edizione
 
 ```sparql
-SELECT DISTINCT ?id ?issue
+SELECT DISTINCT ?id ?edizione
 WHERE {
-  ?id wdt:P1433 ?journal;
+  ?id wdt:P31 wd:Q13442814;
+      wdt:P1433 ?journal;
       rdfs:label ?title.
-  ?journal wdt:P17 wd:Q38;
-           wdt:P31 ?tipo_journal.
-  FILTER(?tipo_journal = wd:Q5633421 || ?tipo_journal = wd:Q737498 || ?tipo_journal = wd:Q773668)
+  ?journal wdt:P17 wd:Q38.
   OPTIONAL {
-    ?id wdt:P433 ?issue .
+    ?id wdt:P433 ?edizione .
   }
   FILTER(LANG(?title) = "it")
 }
@@ -174,11 +157,10 @@ WHERE {
 ```sparql
 SELECT DISTINCT ?id ?volume
 WHERE {
-  ?id wdt:P1433 ?journal;
+  ?id wdt:P31 wd:Q13442814;
+      wdt:P1433 ?journal;
       rdfs:label ?title.
-  ?journal wdt:P17 wd:Q38;
-           wdt:P31 ?tipo_journal.
-  FILTER(?tipo_journal = wd:Q5633421 || ?tipo_journal = wd:Q737498 || ?tipo_journal = wd:Q773668)
+  ?journal wdt:P17 wd:Q38.
   OPTIONAL {
     ?id wdt:P478 ?volume .
   }
@@ -191,11 +173,10 @@ WHERE {
 ```sparql
 SELECT DISTINCT ?id (GROUP_CONCAT(DISTINCT ?editore; SEPARATOR="; ") AS ?editori)
 WHERE {
-  ?id wdt:P1433 ?journal;
+  ?id wdt:P31 wd:Q13442814;
+      wdt:P1433 ?journal;
       rdfs:label ?title.
-  ?journal wdt:P17 wd:Q38;
-           wdt:P31 ?tipo_journal.
-  FILTER(?tipo_journal = wd:Q5633421 || ?tipo_journal = wd:Q737498 || ?tipo_journal = wd:Q773668)
+  ?journal wdt:P17 wd:Q38.
   OPTIONAL {
     ?journal wdt:P123 ?publisher .
     ?publisher rdfs:label ?editore.
@@ -209,13 +190,12 @@ GROUP BY ?id
 ### Indici
 
 ```sparql
-SELECT DISTINCT ?id (GROUP_CONCAT(DISTINCT ?dbLabel; SEPARATOR="; ") AS ?indici)
+SELECT DISTINCT ?id (GROUP_CONCAT(DISTINCT ?dbLabel; SEPARATOR="; ") AS ?basi_dati)
 WHERE {
-  ?id wdt:P1433 ?journal;
+  ?id wdt:P31 wd:Q13442814;
+      wdt:P1433 ?journal;
       rdfs:label ?title.
-  ?journal wdt:P17 wd:Q38;
-           wdt:P31 ?tipo_journal.
-  FILTER(?tipo_journal = wd:Q5633421 || ?tipo_journal = wd:Q737498 || ?tipo_journal = wd:Q773668)
+  ?journal wdt:P17 wd:Q38.
   OPTIONAL {
     ?journal wdt:P8875 ?indexedIn.
     ?indexedIn rdfs:label ?dbLabel.
@@ -231,11 +211,10 @@ GROUP BY ?id
 ```sparql
 SELECT DISTINCT ?id (GROUP_CONCAT(DISTINCT ?url; SEPARATOR="; ") AS ?url_disponibili)
 WHERE {
-  ?id wdt:P1433 ?journal;
+  ?id wdt:P31 wd:Q13442814;
+      wdt:P1433 ?journal;
       rdfs:label ?title.
-  ?journal wdt:P17 wd:Q38;
-           wdt:P31 ?tipo_journal.
-  FILTER(?tipo_journal = wd:Q5633421 || ?tipo_journal = wd:Q737498 || ?tipo_journal = wd:Q773668)
+  ?journal wdt:P17 wd:Q38.
   OPTIONAL {
     ?id wdt:P953 ?url.
   }
@@ -247,16 +226,17 @@ GROUP BY ?id
 ### DOI
 
 ```sparql
-SELECT DISTINCT ?id ?doi
+SELECT DISTINCT ?id (GROUP_CONCAT(DISTINCT ?doi; SEPARATOR="; ") AS ?doi_disponibili)
 WHERE {
-  ?id wdt:P1433 ?journal;
+  ?id wdt:P31 wd:Q13442814;
+      wdt:P1433 ?journal;
       rdfs:label ?title.
   ?journal wdt:P17 wd:Q38;
            wdt:P31 ?tipo_journal.
-  FILTER(?tipo_journal = wd:Q5633421 || ?tipo_journal = wd:Q737498 || ?tipo_journal = wd:Q773668)
   OPTIONAL {
     ?id wdt:P356 ?doi.
   }
   FILTER(LANG(?title) = "it")
 }
+GROUP BY ?id
 ```
